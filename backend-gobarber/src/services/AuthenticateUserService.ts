@@ -1,5 +1,6 @@
 import { getRepository } from 'typeorm';
 import { compare } from 'bcryptjs';
+import { sign } from 'jsonwebtoken';
 
 import User from '../models/User';
 
@@ -10,31 +11,33 @@ interface Request {
 
 interface Response {
     user: User;
+    token: string;
 }
+
 class AuthenticateUserService {
     public async execute({ email, password }: Request): Promise<Response> {
         const userRepository = getRepository(User);
 
         const user = await userRepository.findOne({ where: { email } });
 
-        // se esse usuário não for encontrado
         if (!user) {
-            throw new Error('Incorrect email/password combination.'); // não vou falar explicitamente que o email esta errado pq isso pode abrir brecha para fraude (a pessoa fica tentando varios emails, por exemplo)
+            throw new Error('Incorrect email/password combination.');
         }
-
-        // user.password - Senha criptografada que esta no banco de dados
-        // password - Senha não criptografada
 
         const passwordMatched = await compare(password, user.password);
 
-        // se a senha não bater
         if (!passwordMatched) {
             throw new Error('Incorrect email/password combination.');
         }
 
-        // se passou até aqui -> usuário autenticado
+        const token = sign({}, 'bab8fc77bb9629134f6613aa53b73060', {
+            subject: user.id,
+            expiresIn: '1s',
+        });
+
         return {
             user,
+            token,
         };
     }
 }
