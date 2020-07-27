@@ -2,8 +2,10 @@
 import { getRepository } from 'typeorm';
 import path from 'path';
 import fs from 'fs'; // filesystem do node
-
 import uploadConfig from '../config/upload'; // FIZ ALTERAÇÃO DE CAMINHO NESSE ARQUIVO -> CRIEI O DIRECTORY
+
+import AppError from '../errors/AppError';
+
 import User from '../models/User';
 
 interface Request {
@@ -20,8 +22,9 @@ class UpdateUserAvatarService {
 
         // se não encontrar o usuário
         if (!user) {
-            throw new Error(
+            throw new AppError(
                 'Permission denied, you do not have access to change this content.',
+                401,
             );
         }
 
