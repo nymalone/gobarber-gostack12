@@ -15,13 +15,19 @@ import Button from '../../components/Button';
 
 import { Container, Content, Background } from './styles';
 
+interface SignInFormData {
+  email: string;
+  password: string;
+}
+
 const Signin: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { signIn } = useContext(AuthContext);
+  const { user, signIn } = useContext(AuthContext);
+  console.log(user);
 
   const handleSubmit = useCallback(
-    async (data: object) => {
+    async (data: SignInFormData) => {
       try {
         formRef.current?.setErrors({});
 
