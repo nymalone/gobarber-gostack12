@@ -5,7 +5,7 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/AuthContext';
 import getValidationErrors from '../../utils/getValidationErrors';
 
 import logoImg from '../../assets/logo.svg';
@@ -46,11 +46,15 @@ const Signin: React.FC = () => {
           password: data.password,
         });
       } catch (err) {
-        const errors = getValidationErrors(err);
-        formRef.current?.setErrors(errors);
+        if (err instanceof Yup.ValidationError) {
+          // se for
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
+        }
+        // se o erro não for originado da validação do Yup -> disparar um toast
       }
     },
-    [signIn], // toda variável externa que eu utilizo eu preciso colocar como dependencia
+    [signIn],
   );
 
   return (

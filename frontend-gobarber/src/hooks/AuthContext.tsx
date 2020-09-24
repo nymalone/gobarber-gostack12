@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import React, { createContext, useCallback, useState, useContext } from 'react';
 import api from '../services/api';
 
@@ -13,41 +14,46 @@ interface SignInCredentials {
 interface AuthContextData {
   user: object;
   signIn(credentials: SignInCredentials): Promise<void>;
+  signOut(): void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
-  // vou inciar essa variável utilizando uma função pq eu quero buscar os valores que eu tenho no inicia baseado no meu localstorage
   const [data, setData] = useState<AuthState>(() => {
     const token = localStorage.getItem('@GoBarber:token');
     const user = localStorage.getItem('@GoBarber:user');
 
     if (token && user) {
-      return { token, user: JSON.parse(user) }; // preciso transformar de volta para um objeto
+      return { token, user: JSON.parse(user) };
     }
 
     return {} as AuthState;
   });
 
-  // para conseguir autenticação eu preciso receber minhas credenciais
   const signIn = useCallback(async ({ email, password }) => {
     const response = await api.post('sessions', {
       email,
       password,
-    }); // minha rota de criação no back
+    });
 
     const { token, user } = response.data;
 
-    // coloco um prefixo para esse token nao se perder em meio aos outros que eu tenho no localhost
     localStorage.setItem('@GoBarber:token', token);
     localStorage.setItem('@GoBarber:user', JSON.stringify(user));
 
     setData({ token, user });
   }, []);
 
+  const signOut = useCallback(() => {
+    localStorage.removeItem('@GoBarber:token');
+    localStorage.removeItem('@GoBarber:user');
+
+    setData({} as AuthState); // vai faer com que o usuário não tenha mais login e token aceito
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user: data.user, signIn }}>
+    <AuthContext.Provider value={{ user: data.user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
