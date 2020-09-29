@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import React, { useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
@@ -29,6 +29,8 @@ const Signin: React.FC = () => {
   const { signIn } = useAuth();
   const { addToast } = useToast(); // o que fica dentro das chaves é o método que eu criei
 
+  const history = useHistory();
+
   const handleSubmit = useCallback(
     async (data: SignInFormData) => {
       try {
@@ -49,6 +51,8 @@ const Signin: React.FC = () => {
           email: data.email,
           password: data.password,
         });
+
+        history.push('/dashboard');
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           // se for
@@ -66,7 +70,7 @@ const Signin: React.FC = () => {
         });
       }
     },
-    [signIn, addToast],
+    [signIn, addToast, history],
   );
 
   return (
