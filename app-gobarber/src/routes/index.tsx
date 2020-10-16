@@ -1,24 +1,24 @@
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native'; // como se fosse o provider!
+import { View, ActivityIndicator} from 'react-native';
 
-import SignIn from '../pages/SignIn';
-import SignUp from '../pages/SignUp';
+import AuthRoutes from './auth.routes';
+import AppRoutes from './app.routes';
 
-const Auth = createStackNavigator();
 
-const AuthRoutes: React.FC = () => (
-  <NavigationContainer>
-    <Auth.Navigator
-      screenOptions={{
-        headerShown: false,
-        cardStyle: { backgroundColor: '#312e38' }, // estilo que vou aplicar dentro das rotas
-      }}
-    >
-      <Auth.Screen name="SignIn" component={SignIn} />
-      <Auth.Screen name="SignUp" component={SignUp} />
-    </Auth.Navigator>
-  </NavigationContainer>
-);
+import {useAuth} from '../hooks/auth'
 
-export default AuthRoutes;
+const Routes: React.FC = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}} >
+        <ActivityIndicator size="large" color="#ff9000" />
+      </View>
+    )
+  }
+
+  return user ? <AppRoutes /> : <AuthRoutes /> // se tem usuario logado mostra app routes (privadas) se nao authroutes
+};
+
+export default Routes;
