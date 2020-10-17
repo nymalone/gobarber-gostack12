@@ -2,10 +2,9 @@
 import { getRepository } from 'typeorm';
 import path from 'path';
 import fs from 'fs'; // filesystem do node
-import uploadConfig from '../../../config/upload'; // FIZ ALTERAÇÃO DE CAMINHO NESSE ARQUIVO -> CRIEI O DIRECTORY
 
-import AppError from '../../../shared/errors/AppError';
-
+import uploadConfig from '@config/upload'; // FIZ ALTERAÇÃO DE CAMINHO NESSE ARQUIVO -> CRIEI O DIRECTORY
+import AppError from '@shared/errors/AppError';
 import User from '../infra/typeorm/entities/User';
 
 interface Request {
