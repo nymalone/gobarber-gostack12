@@ -1,23 +1,25 @@
 /* eslint-disable camelcase */
-import { getRepository } from 'typeorm';
 import path from 'path';
 import fs from 'fs'; // filesystem do node
 
 import uploadConfig from '@config/upload'; // FIZ ALTERAÇÃO DE CAMINHO NESSE ARQUIVO -> CRIEI O DIRECTORY
+
 import AppError from '@shared/errors/AppError';
+import IUsersRepository from '../repositories/IUsersRepository';
+
 import User from '../infra/typeorm/entities/User';
 
-interface Request {
+interface IRequest {
     user_id: string; // uuid
     avatarFilename: string;
 }
 
 class UpdateUserAvatarService {
-    public async execute({ user_id, avatarFilename }: Request): Promise<User> {
-        const userRepository = getRepository(User);
+    constructor(private usersRepository: IUsersRepository) {}
 
+    public async execute({ user_id, avatarFilename }: IRequest): Promise<User> {
         // preciso verificar se o ID que estou recebendo é um ID de usuário válido
-        const user = await userRepository.findOne(user_id);
+        const user = await this.usersRepository.findById(user_id);
 
         // se não encontrar o usuário
         if (!user) {
@@ -47,7 +49,7 @@ class UpdateUserAvatarService {
         }
 
         user.avatar = avatarFilename; // atualizo minha coluna avatar
-        await userRepository.save(user); // salvo no meu repositório
+        await this.usersRepository.save(user); // salvo no meu repositório
 
         return user;
     }
