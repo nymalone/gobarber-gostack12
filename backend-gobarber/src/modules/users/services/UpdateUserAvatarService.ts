@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import path from 'path';
 import fs from 'fs'; // filesystem do node
+import { injectable, inject } from 'tsyringe';
 
 import uploadConfig from '@config/upload'; // FIZ ALTERAÇÃO DE CAMINHO NESSE ARQUIVO -> CRIEI O DIRECTORY
 
@@ -14,8 +15,12 @@ interface IRequest {
     avatarFilename: string;
 }
 
+@injectable()
 class UpdateUserAvatarService {
-    constructor(private usersRepository: IUsersRepository) {}
+    constructor(
+        @inject('UsersRepository')
+        private usersRepository: IUsersRepository,
+    ) {}
 
     public async execute({ user_id, avatarFilename }: IRequest): Promise<User> {
         // preciso verificar se o ID que estou recebendo é um ID de usuário válido
