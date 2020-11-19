@@ -1,11 +1,8 @@
 /* eslint-disable camelcase */
-import path from 'path';
-import fs from 'fs'; // filesystem do node
 import { injectable, inject } from 'tsyringe';
 
-import uploadConfig from '@config/upload'; // FIZ ALTERAÇÃO DE CAMINHO NESSE ARQUIVO -> CRIEI O DIRECTORY
-
 import AppError from '@shared/errors/AppError';
+import IStorageProvider from '@shared/container/providers/StorageProviders/models/IStorageProvider';
 import IUsersRepository from '../repositories/IUsersRepository';
 
 import User from '../infra/typeorm/entities/User';
@@ -20,6 +17,9 @@ class UpdateUserAvatarService {
     constructor(
         @inject('UsersRepository')
         private usersRepository: IUsersRepository,
+
+        @inject('StorageProvider')
+        private storageProvider: IStorageProvider,
     ) {}
 
     public async execute({ user_id, avatarFilename }: IRequest): Promise<User> {
@@ -34,26 +34,13 @@ class UpdateUserAvatarService {
             );
         }
 
-        // se ele já atinha um avatar, tenho que deletar o anterior
         if (user.avatar) {
-            // vou buscar o arquivo de usuário utilizando o path no node
-            const userAvatarFilePath = path.join(
-                // caminho e nome do arquivo que quero deletar
-                uploadConfig.directory,
-                user.avatar,
-            );
-            // vou checar se esse arquivo realmente existe
-            const userAvatarFileExists = await fs.promises.stat(
-                userAvatarFilePath,
-            ); // garanta que eu vou utilizar as funçoes do FS do node em formato de primises e não callback
-            // STAT -> função que traz o status de um arquivo, porém SÓ se ele existir
-            if (userAvatarFileExists) {
-                // se o arquivo então existe
-                await fs.promises.unlink(userAvatarFilePath); // arquivo deletado!!
-            }
+            this.storageProvider.deleteFile(user.avatar); // se ele ja tinha foto, eu deleto a anterior e salvo o novo usando o metodo saveFile
         }
 
-        user.avatar = avatarFilename; // atualizo minha coluna avatar
+        const fileName = await this.storageProvider.saveFile(avatarFilename);
+
+        user.avatar = fileName; // atualizo minha coluna avatar
         await this.usersRepository.save(user); // salvo no meu repositório
 
         return user;
