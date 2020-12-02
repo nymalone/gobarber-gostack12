@@ -9,6 +9,9 @@ import AppointmentsRepository from '@modules/appointments/infra/typeorm/reposito
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 import UsersRepository from '@modules/users/infra/typeorm/repositories/UsersRepository';
 
+// import IUserTokensRepository from '@modules/users/repositories/IUserTokensRepository';
+// import UserTokensRepository from '@modules/users/infra/typeorm/repositories/UserTokensRepository';
+
 // o id que eu coloco na minha injeção é sempre o nome do repositório
 container.registerSingleton<IAppointmentsRepository>( // garante que a variavel que estou passando como segundo parâmetro  tenha exatamente o formato da minha interface
     'AppointmentsRepository',
@@ -19,3 +22,8 @@ container.registerSingleton<IUsersRepository>(
     'UsersRepository',
     UsersRepository,
 );
+
+// container.registerSingleton<IUserTokensRepository>(
+//     'UserTokensRepository',
+//     UserTokensRepository,
+// );

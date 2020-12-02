@@ -34,7 +34,7 @@ describe('CreateAppointment', () => {
         });
 
         // eu espero que essa promisse rejeite, ou seja, retorne um resultado não de sucesso e que a resposta seja um erro (no caso o meu arquivo AppError)
-        expect(
+        await expect(
             createAppointment.execute({
                 date: appointmentDate,
                 provider_id: '123456',
